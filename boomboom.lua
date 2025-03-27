@@ -120,6 +120,15 @@ VisualTab:CreateButton({
     end
 })
 
+-- Créer un Color Picker pour la couleur de l'ESP
+VisualTab:CreateColorPicker({
+    Name = "ESP Color",
+    DefaultColor = _G.TextColor,
+    Callback = function(color)
+        _G.TextColor = color
+    end
+})
+
 
 -- Créer un Slider pour la taille du texte
 VisualTab:CreateSlider({
