@@ -1,0 +1,242 @@
+local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
+
+-- Attendre que le jeu soit complètement chargé
+repeat wait() until game:IsLoaded()
+
+-- Créer la fenêtre principale avec Rayfield
+local Window = Rayfield:CreateWindow({
+    Name = "ACS script ez free bounty",
+    LoadingTitle = "Chargement...",
+    LoadingSubtitle = "by Nyzox & Melime ( 98 aussi )",
+    ConfigurationSaving = {
+        Enabled = true,
+        FolderName = nil,
+        FileName = "ACSExplosiveSettings"
+    },
+    Discord = {
+        Enabled = false,
+        Invite = "",
+        RememberJoins = true
+    },
+    KeySystem = false,
+    Key = "nyzoxmelimelesgoats" 
+})
+
+-- Variables nécessaires
+local plr = game.Players.LocalPlayer
+local Evt = game.ReplicatedStorage.ACS_Engine.Eventos
+
+local Settings = {
+    ["ExplosiveHit"] = true,
+    ["ExPressure"] = math.huge,
+    ["ExpRadius"] = math.huge,
+    ["DestroyJointRadiusPercent"] = math.huge,
+    ["ExplosionDamage"] = math.huge,
+}
+
+local function API_Check()
+    if Drawing == nil then
+        return "No"
+    else
+        return "Yes"
+    end
+end
+
+local Find_Required = API_Check()
+
+if Find_Required == "No" then
+    game:GetService("StarterGui"):SetCore("SendNotification",{
+        Title = "Exunys Developer";
+        Text = "ESP script could not be loaded because your exploit is unsupported.";
+        Duration = math.huge;
+        Button1 = "OK"
+    })
+
+    return
+end
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local Camera = workspace.CurrentCamera
+
+local Typing = false
+
+_G.SendNotifications = true   -- If set to true then the script would notify you frequently on any changes applied and when loaded / errored. (If a game can detect this, it is recommended to set it to false)
+_G.DefaultSettings = false   -- If set to true then the ESP script would run with default settings regardless of any changes you made.
+
+_G.TeamCheck = false   -- If set to true then the script would create ESP only for the enemy team members.
+
+_G.ESPVisible = true   -- If set to true then the ESP will be visible and vice versa.
+_G.TextColor = Color3.fromRGB(255, 80, 10)   -- The color that the boxes would appear as.
+_G.TextSize = 14   -- The size of the text.
+_G.Center = true   -- If set to true then the script would be located at the center of the label.
+_G.Outline = true   -- If set to true then the text would have an outline.
+_G.OutlineColor = Color3.fromRGB(0, 0, 0)   -- The outline color of the text.
+_G.TextTransparency = 0.7   -- The transparency of the text.
+_G.TextFont = Drawing.Fonts.UI   -- The font of the text. (UI, System, Plex, Monospace) 
+
+-- Activer l'ESP dès le départ sans utiliser de touche
+_G.ESPVisible = true
+
+local function CreateESP()
+    for _, v in next, Players:GetPlayers() do
+        if v.Name ~= Players.LocalPlayer.Name then
+            local ESP = Drawing.new("Text")
+
+            RunService.RenderStepped:Connect(function()
+                if workspace:FindFirstChild(v.Name) ~= nil and workspace[v.Name]:FindFirstChild("HumanoidRootPart") ~= nil then
+                    local Vector, OnScreen = Camera:WorldToViewportPoint(workspace[v.Name]:WaitForChild("Head", math.huge).Position)
+
+                    ESP.Size = _G.TextSize
+                    ESP.Center = _G.Center
+                    ESP.Outline = _G.Outline
+                    ESP.OutlineColor = _G.OutlineColor
+                    ESP.Color = _G.TextColor
+                    ESP.Transparency = _G.TextTransparency
+                    ESP.Font = _G.TextFont
+
+                    if OnScreen == true then
+                        local Part1 = workspace:WaitForChild(v.Name, math.huge):WaitForChild("HumanoidRootPart", math.huge).Position
+                        local Part2 = workspace:WaitForChild(Players.LocalPlayer.Name, math.huge):WaitForChild("HumanoidRootPart", math.huge).Position or 0
+                        local Dist = (Part1 - Part2).Magnitude
+                        ESP.Position = Vector2.new(Vector.X, Vector.Y - 25)
+                        ESP.Text = ("("..tostring(math.floor(tonumber(Dist)))..") "..v.Name.." ["..workspace[v.Name].Humanoid.Health.."]")
+                        if _G.TeamCheck == true then 
+                            if Players.LocalPlayer.Team ~= v.Team then
+                                ESP.Visible = _G.ESPVisible
+                            else
+                                ESP.Visible = false
+                            end
+                        else
+                            ESP.Visible = _G.ESPVisible
+                        end
+                    else
+                        ESP.Visible = false
+                    end
+                else
+                    ESP.Visible = false
+                end
+            end)
+
+            Players.PlayerRemoving:Connect(function()
+                ESP.Visible = false
+            end)
+        end
+    end
+
+    Players.PlayerAdded:Connect(function(Player)
+        Player.CharacterAdded:Connect(function(v)
+            if v.Name ~= Players.LocalPlayer.Name then 
+                local ESP = Drawing.new("Text")
+    
+                RunService.RenderStepped:Connect(function()
+                    if workspace:FindFirstChild(v.Name) ~= nil and workspace[v.Name]:FindFirstChild("HumanoidRootPart") ~= nil then
+                        local Vector, OnScreen = Camera:WorldToViewportPoint(workspace[v.Name]:WaitForChild("Head", math.huge).Position)
+    
+                        ESP.Size = _G.TextSize
+                        ESP.Center = _G.Center
+                        ESP.Outline = _G.Outline
+                        ESP.OutlineColor = _G.OutlineColor
+                        ESP.Color = _G.TextColor
+                        ESP.Transparency = _G.TextTransparency
+    
+                        if OnScreen == true then
+                            local Part1 = workspace:WaitForChild(v.Name, math.huge):WaitForChild("HumanoidRootPart", math.huge).Position
+                        local Part2 = workspace:WaitForChild(Players.LocalPlayer.Name, math.huge):WaitForChild("HumanoidRootPart", math.huge).Position or 0
+                            local Dist = (Part1 - Part2).Magnitude
+                            ESP.Position = Vector2.new(Vector.X, Vector.Y - 25)
+                            ESP.Text = ("("..tostring(math.floor(tonumber(Dist)))..") "..v.Name.." ["..workspace[v.Name].Humanoid.Health.."]")
+                            if _G.TeamCheck == true then 
+                                if Players.LocalPlayer.Team ~= Player.Team then
+                                    ESP.Visible = _G.ESPVisible
+                                else
+                                    ESP.Visible = false
+                                end
+                            else
+                                ESP.Visible = _G.ESPVisible
+                            end
+                        else
+                            ESP.Visible = false
+                        end
+                    else
+                        ESP.Visible = false
+                    end
+                end)
+    
+                Players.PlayerRemoving:Connect(function()
+                    ESP.Visible = false
+                end)
+            end
+        end)
+    end)
+end
+
+-- Créer un onglet pour les actions sur les joueurs
+local PlayerTab = Window:CreateTab("Player Actions", 4483362458)
+
+-- Créer un bouton "Boom Boom"
+PlayerTab:CreateButton({
+    Name = "Boom Boom",
+    Callback = function()
+        -- Code pour faire exploser tous les joueurs
+        for _, player in pairs(game.Players:GetChildren()) do
+            if player.Character and player.Character.Head then
+                Evt.Hit:FireServer(player.Character.Head.Position, player.Character.Head, player.Character.Head.Position, Enum.Material.Plastic, Settings)
+            end
+        end
+        print("Boom Boom activé !")
+    end
+})
+
+-- Créer un onglet pour ESP
+local VisualTab = Window:CreateTab("ESP", 4483362458)
+
+-- Activer/Désactiver l'ESP
+VisualTab:CreateButton({
+    Name = "Toggle ESP",
+    Callback = function()
+        ESPEnabled = not ESPEnabled
+        print("ESP " .. (ESPEnabled and "Enabled" or "Disabled"))
+    end
+})
+
+-- Sélectionner la couleur de l'ESP
+VisualTab:CreateColorPicker({
+    Name = "ESP Color",
+    DefaultColor = ESPColor,
+    Callback = function(color)
+        ESPColor = color
+        print("Couleur ESP changée")
+    end
+})
+
+-- Créer un onglet pour l'Aimbot
+local AimbotTab = Window:CreateTab("Aimbot", 4483362458)
+
+-- Activer/Désactiver le Silent Aim
+AimbotTab:CreateButton({
+    Name = "Toggle Silent Aim",
+    Callback = function()
+        SilentAimEnabled = not SilentAimEnabled
+        print("Silent Aim " .. (SilentAimEnabled and "Activé" or "Désactivé"))
+    end
+})
+
+-- Mettre à jour l'ESP et gérer l'Aimbot et Silent Aim
+local RunService = game:GetService("RunService")
+local plrs = game:GetService("Players")
+
+-- Fonction pour mettre à jour l'ESP
+RunService.RenderStepped:Connect(function()
+    if ESPEnabled then
+        -- Met à jour l'ESP avec une boîte ou d'autres éléments visuels
+        for _, player in pairs(plrs:GetPlayers()) do
+            if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                -- Créez un box de ESP autour du joueur
+            end
+        end
+    end
+end)
+
+Window:Display()
