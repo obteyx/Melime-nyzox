@@ -1,0 +1,231 @@
+local ScreenGui = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local DeleteButton = Instance.new("TextButton")
+local VoiceChatButton = Instance.new("TextButton")
+local WalkSpeedButton = Instance.new("TextButton")
+local WalkSpeedInput = Instance.new("TextBox")
+local FlyButton = Instance.new("TextButton")
+local UICorner = Instance.new("UICorner")
+local UIListLayout = Instance.new("UIListLayout")
+local SuccessMessage = Instance.new("TextLabel")
+local TitleLabel = Instance.new("TextLabel")
+
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.Name = "SafeZoneNukerUI"
+
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+MainFrame.Size = UDim2.new(0, 300, 0, 300)
+MainFrame.Position = UDim2.new(0.5, -150, 0.5, -150)
+MainFrame.BorderSizePixel = 0
+
+UICorner.Parent = MainFrame
+UICorner.CornerRadius = UDim.new(0, 12)
+
+UIListLayout.Parent = MainFrame
+UIListLayout.FillDirection = Enum.FillDirection.Vertical
+UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+UIListLayout.Padding = UDim.new(0, 10)
+
+local dragging = false
+local dragInput, dragStart, startPos
+
+local function updateDrag(input)
+    local delta = input.Position - dragStart
+    MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+end
+
+MainFrame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = MainFrame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+MainFrame.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement and dragging then
+        updateDrag(input)
+    end
+end)
+
+TitleLabel.Parent = ScreenGui
+TitleLabel.Size = UDim2.new(0, 300, 0, 50)
+TitleLabel.Position = UDim2.new(0.5, -150, 0.2, -25)
+TitleLabel.BackgroundTransparency = 1
+TitleLabel.Text = "By melimeloxcckz"
+TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+TitleLabel.TextScaled = true
+TitleLabel.TextStrokeTransparency = 0.5
+TitleLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+
+local gradient = Instance.new("UIGradient")
+gradient.Parent = TitleLabel
+gradient.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
+    ColorSequenceKeypoint.new(0.25, Color3.fromRGB(255, 255, 0)),
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 255, 0)),
+    ColorSequenceKeypoint.new(0.75, Color3.fromRGB(0, 0, 255)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 255)),
+})
+
+DeleteButton.Parent = MainFrame
+DeleteButton.Size = UDim2.new(0, 260, 0, 50)
+DeleteButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+DeleteButton.Text = "Delete Safe Zone"
+DeleteButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+DeleteButton.TextScaled = true
+DeleteButton.BorderSizePixel = 0
+
+local Corner1 = Instance.new("UICorner")
+Corner1.CornerRadius = UDim.new(0, 8)
+Corner1.Parent = DeleteButton
+
+VoiceChatButton.Parent = MainFrame
+VoiceChatButton.Size = UDim2.new(0, 260, 0, 50)
+VoiceChatButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+VoiceChatButton.Text = "Bypass VC"
+VoiceChatButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+VoiceChatButton.TextScaled = true
+VoiceChatButton.BorderSizePixel = 0
+
+local Corner2 = Instance.new("UICorner")
+Corner2.CornerRadius = UDim.new(0, 8)
+Corner2.Parent = VoiceChatButton
+
+WalkSpeedButton.Parent = MainFrame
+WalkSpeedButton.Size = UDim2.new(0, 260, 0, 50)
+WalkSpeedButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+WalkSpeedButton.Text = "Apply WalkSpeed"
+WalkSpeedButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+WalkSpeedButton.TextScaled = true
+WalkSpeedButton.BorderSizePixel = 0
+
+local Corner3 = Instance.new("UICorner")
+Corner3.CornerRadius = UDim.new(0, 8)
+Corner3.Parent = WalkSpeedButton
+
+WalkSpeedInput.Parent = MainFrame
+WalkSpeedInput.Size = UDim2.new(0, 260, 0, 30)
+WalkSpeedInput.Position = UDim2.new(0, 0, 0, 60)
+WalkSpeedInput.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+WalkSpeedInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+WalkSpeedInput.PlaceholderText = "Enter WalkSpeed"
+WalkSpeedInput.TextScaled = true
+WalkSpeedInput.BorderSizePixel = 0
+
+FlyButton.Parent = MainFrame
+FlyButton.Size = UDim2.new(0, 260, 0, 50)
+FlyButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+FlyButton.Text = "Activate Fly"
+FlyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+FlyButton.TextScaled = true
+FlyButton.BorderSizePixel = 0
+
+local Corner4 = Instance.new("UICorner")
+Corner4.CornerRadius = UDim.new(0, 8)
+Corner4.Parent = FlyButton
+
+DeleteButton.MouseButton1Click:Connect(function()
+    for _, v in pairs(game:GetDescendants()) do
+        if v:IsA("BasePart") and v.Name == "SafeZone" then
+            v:Destroy()
+        end
+    end
+end)
+
+VoiceChatButton.MouseButton1Click:Connect(function()
+    game:GetService("VoiceChatService"):joinVoice()
+end)
+
+WalkSpeedButton.MouseButton1Click:Connect(function()
+    local speed = tonumber(WalkSpeedInput.Text)
+    if speed then
+        local player = game.Players.LocalPlayer
+        local character = player.Character or player.CharacterAdded:Wait()
+        local humanoid = character:WaitForChild("Humanoid")
+        humanoid.WalkSpeed = speed
+    else
+        print("Veuillez entrer une valeur valide pour WalkSpeed.")
+    end
+end)
+
+FlyButton.MouseButton1Click:Connect(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/XNEOFF/FlyGuiV3/main/FlyGuiV3.txt"))()
+end)
+
+task.spawn(function()
+    local g = getinfo or debug.getinfo
+    local d = false
+    local h = {}
+
+    local x, y
+
+    setthreadidentity(2)
+
+    for i, v in getgc(true) do
+        if typeof(v) == "table" then
+            local a = rawget(v, "Detected")
+            local b = rawget(v, "Kill")
+        
+            if typeof(a) == "function" and not x then
+                x = a
+                local o; o = hookfunction(x, function(c, f, n)
+                    if c ~= "_" then
+                        if d then
+                            warn(`Adonis AntiCheat flagged\nMethod: {c}\nInfo: {f}`)
+                        end
+                    end
+                    return true
+                end)
+
+                table.insert(h, x)
+            end
+
+            if rawget(v, "Variables") and rawget(v, "Process") and typeof(b) == "function" and not y then
+                y = b
+                local o; o = hookfunction(y, function(f)
+                    if d then
+                        warn(`Adonis AntiCheat tried to kill (fallback): {f}`)
+                    end
+                end)
+
+                table.insert(h, y)
+            end
+        end
+    end
+
+    local o; o = hookfunction(getrenv().debug.info, newcclosure(function(...)
+        local a, f = ...
+        if x and a == x then
+            if d then
+                warn(`zins | adonis bypassed`)
+            end
+            return coroutine.yield(coroutine.running())
+        end
+        return o(...)
+    end))
+
+    setthreadidentity(7)
+
+    SuccessMessage.Parent = ScreenGui
+    SuccessMessage.Size = UDim2.new(0, 300, 0, 50)
+    SuccessMessage.Position = UDim2.new(1, -310, 1, -60)
+    SuccessMessage.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+    SuccessMessage.Text = "Bypass Adonis Successfully"
+    SuccessMessage.TextColor3 = Color3.fromRGB(255, 255, 255)
+    SuccessMessage.TextScaled = true
+    SuccessMessage.BorderSizePixel = 0
+    SuccessMessage.TextStrokeTransparency = 0.5
+    SuccessMessage.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+
+    SuccessMessage:TweenPosition(UDim2.new(1, -310, 1, -60), "Out", "Linear", 2, true)
+
+    wait(2)
+end)
