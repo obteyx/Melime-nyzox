@@ -16,8 +16,7 @@ function VbeUi.new()
     Frame.Name = "MainFrame"
     Frame.Position = UDim2.new(0.4, 0, 0.2, 0)
     Frame.Size = UDim2.new(0, 480, 0, 550)
-    Frame.BackgroundColor3 = Color3.new(0,0,0)
-    Frame.BackgroundTransparency = 0.15
+    Frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
     Frame.BorderSizePixel = 0
     Frame.Parent = ScreenGui
 
@@ -28,75 +27,83 @@ function VbeUi.new()
     Close.Name = "CloseButton"
     Close.Position = UDim2.new(0.95, 0, 0.03, 0)
     Close.Size = UDim2.new(0, 20, 0, 20)
-    Close.BackgroundColor3 = Color3.new(1,0,0)
-    Close.BackgroundTransparency = 0.15
+    Close.BackgroundColor3 = Color3.fromRGB(220, 50, 50)
     Close.BorderSizePixel = 0
-    Close.Text = ""
+    Close.Text = "X"
+    Close.TextColor3 = Color3.new(1,1,1)
+    Close.Font = Enum.Font.SourceSansBold
+    Close.TextSize = 18
     Close.Parent = Frame
-
-    local UICornerClose = Instance.new("UICorner")
-    UICornerClose.Parent = Close
 
     Close.MouseButton1Click:Connect(function()
         ScreenGui:Destroy()
     end)
 
-    local tabs = {}
+    -- Container for tab buttons
+    local TabButtonsFrame = Instance.new("Frame")
+    TabButtonsFrame.Size = UDim2.new(1, 0, 0, 40)
+    TabButtonsFrame.Position = UDim2.new(0, 0, 0, 50)
+    TabButtonsFrame.BackgroundTransparency = 1
+    TabButtonsFrame.Parent = Frame
+
+    local TabsContentFrame = Instance.new("Frame")
+    TabsContentFrame.Size = UDim2.new(1, 0, 1, -100)
+    TabsContentFrame.Position = UDim2.new(0, 0, 0, 100)
+    TabsContentFrame.BackgroundTransparency = 1
+    TabsContentFrame.Parent = Frame
+
+    local tabNames = {"Tab 1", "Tab 2", "Tab 3"}
     local tabButtons = {}
-    local tabContents = {}
+    local tabFrames = {}
 
-    local tabNames = {"Tab 1", "Tab 2"}
-
-    local tabButtonFrame = Instance.new("Frame")
-    tabButtonFrame.Name = "TabButtons"
-    tabButtonFrame.Position = UDim2.new(0,0,0,50)
-    tabButtonFrame.Size = UDim2.new(0, 480, 0, 50)
-    tabButtonFrame.BackgroundTransparency = 1
-    tabButtonFrame.Parent = Frame
-
-    for i, name in ipairs(tabNames) do
-        local tabBtn = Instance.new("TextButton")
-        tabBtn.Name = "TabButton"..i
-        tabBtn.Size = UDim2.new(0, 120, 0, 40)
-        tabBtn.Position = UDim2.new(0, (i-1)*130, 0, 0)
-        tabBtn.BackgroundTransparency = 1
-        tabBtn.Text = name
-        tabBtn.TextColor3 = Color3.fromRGB(60, 0, 255)
-        tabBtn.TextSize = 18
-        tabBtn.Font = Enum.Font.SourceSans
-        tabBtn.Parent = tabButtonFrame
-
-        tabButtons[i] = tabBtn
-
-        local tabContent = Instance.new("Frame")
-        tabContent.Name = "TabContent"..i
-        tabContent.Position = UDim2.new(0, 0, 0, 100)
-        tabContent.Size = UDim2.new(1, 0, 1, -100)
-        tabContent.BackgroundTransparency = 1
-        tabContent.Parent = Frame
-        tabContent.Visible = false
-
-        tabContents[i] = tabContent
+    local function createTabContent(name)
+        local content = Instance.new("Frame")
+        content.Name = name .. "_Content"
+        content.Size = UDim2.new(1, 0, 1, 0)
+        content.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+        content.BorderSizePixel = 0
+        content.Visible = false
+        content.Parent = TabsContentFrame
+        return content
     end
 
-    local currentTab = 1
-    tabContents[currentTab].Visible = true
+    for i, name in ipairs(tabNames) do
+        -- Create tab button
+        local tabBtn = Instance.new("TextButton")
+        tabBtn.Name = name .. "_TabButton"
+        tabBtn.Size = UDim2.new(0, 140, 1, 0)
+        tabBtn.Position = UDim2.new(0, (i-1)*150, 0, 0)
+        tabBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+        tabBtn.BorderSizePixel = 0
+        tabBtn.Text = name
+        tabBtn.TextColor3 = Color3.new(1,1,1)
+        tabBtn.Font = Enum.Font.SourceSansBold
+        tabBtn.TextSize = 16
+        tabBtn.Parent = TabButtonsFrame
 
-    local TweenService = game:GetService("TweenService")
+        table.insert(tabButtons, tabBtn)
 
-    local function switchTab(newTab)
-        if newTab == currentTab then return end
+        -- Create content frame
+        local contentFrame = createTabContent(name)
+        table.insert(tabFrames, contentFrame)
+    end
 
-        local oldTab = currentTab
-        currentTab = newTab
+    -- Active tab tracking
+    local activeTabIndex = 1
+    tabFrames[activeTabIndex].Visible = true
+    tabButtons[activeTabIndex].BackgroundColor3 = Color3.fromRGB(90, 90, 255)
 
-        tabContents[oldTab].Visible = false
-        tabContents[newTab].Visible = true
+    local function switchTab(index)
+        if index == activeTabIndex then return end
+        -- Hide old tab content and reset button color
+        tabFrames[activeTabIndex].Visible = false
+        tabButtons[activeTabIndex].BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 
-        local goalPos = UDim2.new(0.4 + (newTab-1)*0.1, 0, 0.2, 0)
-        local tweenInfo = TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-        local tween = TweenService:Create(Frame, tweenInfo, {Position = goalPos})
-        tween:Play()
+        -- Show new tab content and highlight button
+        tabFrames[index].Visible = true
+        tabButtons[index].BackgroundColor3 = Color3.fromRGB(90, 90, 255)
+
+        activeTabIndex = index
     end
 
     for i, btn in ipairs(tabButtons) do
@@ -107,7 +114,7 @@ function VbeUi.new()
 
     self.ScreenGui = ScreenGui
     self.Frame = Frame
-    self.Tabs = tabContents
+    self.Tabs = tabFrames
     self.TabButtons = tabButtons
     self.SwitchTab = switchTab
 
@@ -115,3 +122,4 @@ function VbeUi.new()
 end
 
 return VbeUi
+
