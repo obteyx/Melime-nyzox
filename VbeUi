@@ -1,0 +1,117 @@
+local VbeUi = {}
+VbeUi.__index = VbeUi
+
+function VbeUi.new()
+    local self = setmetatable({}, VbeUi)
+
+    local player = game.Players.LocalPlayer
+    local playerGui = player:WaitForChild("PlayerGui")
+
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "VbeUi"
+    ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    ScreenGui.Parent = playerGui
+
+    local Frame = Instance.new("Frame")
+    Frame.Name = "MainFrame"
+    Frame.Position = UDim2.new(0.4, 0, 0.2, 0)
+    Frame.Size = UDim2.new(0, 480, 0, 550)
+    Frame.BackgroundColor3 = Color3.new(0,0,0)
+    Frame.BackgroundTransparency = 0.15
+    Frame.BorderSizePixel = 0
+    Frame.Parent = ScreenGui
+
+    local UICorner = Instance.new("UICorner")
+    UICorner.Parent = Frame
+
+    local Close = Instance.new("TextButton")
+    Close.Name = "CloseButton"
+    Close.Position = UDim2.new(0.95, 0, 0.03, 0)
+    Close.Size = UDim2.new(0, 20, 0, 20)
+    Close.BackgroundColor3 = Color3.new(1,0,0)
+    Close.BackgroundTransparency = 0.15
+    Close.BorderSizePixel = 0
+    Close.Text = ""
+    Close.Parent = Frame
+
+    local UICornerClose = Instance.new("UICorner")
+    UICornerClose.Parent = Close
+
+    Close.MouseButton1Click:Connect(function()
+        ScreenGui:Destroy()
+    end)
+
+    local tabs = {}
+    local tabButtons = {}
+    local tabContents = {}
+
+    local tabNames = {"Tab 1", "Tab 2"}
+
+    local tabButtonFrame = Instance.new("Frame")
+    tabButtonFrame.Name = "TabButtons"
+    tabButtonFrame.Position = UDim2.new(0,0,0,50)
+    tabButtonFrame.Size = UDim2.new(0, 480, 0, 50)
+    tabButtonFrame.BackgroundTransparency = 1
+    tabButtonFrame.Parent = Frame
+
+    for i, name in ipairs(tabNames) do
+        local tabBtn = Instance.new("TextButton")
+        tabBtn.Name = "TabButton"..i
+        tabBtn.Size = UDim2.new(0, 120, 0, 40)
+        tabBtn.Position = UDim2.new(0, (i-1)*130, 0, 0)
+        tabBtn.BackgroundTransparency = 1
+        tabBtn.Text = name
+        tabBtn.TextColor3 = Color3.fromRGB(60, 0, 255)
+        tabBtn.TextSize = 18
+        tabBtn.Font = Enum.Font.SourceSans
+        tabBtn.Parent = tabButtonFrame
+
+        tabButtons[i] = tabBtn
+
+        local tabContent = Instance.new("Frame")
+        tabContent.Name = "TabContent"..i
+        tabContent.Position = UDim2.new(0, 0, 0, 100)
+        tabContent.Size = UDim2.new(1, 0, 1, -100)
+        tabContent.BackgroundTransparency = 1
+        tabContent.Parent = Frame
+        tabContent.Visible = false
+
+        tabContents[i] = tabContent
+    end
+
+    local currentTab = 1
+    tabContents[currentTab].Visible = true
+
+    local TweenService = game:GetService("TweenService")
+
+    local function switchTab(newTab)
+        if newTab == currentTab then return end
+
+        local oldTab = currentTab
+        currentTab = newTab
+
+        tabContents[oldTab].Visible = false
+        tabContents[newTab].Visible = true
+
+        local goalPos = UDim2.new(0.4 + (newTab-1)*0.1, 0, 0.2, 0)
+        local tweenInfo = TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+        local tween = TweenService:Create(Frame, tweenInfo, {Position = goalPos})
+        tween:Play()
+    end
+
+    for i, btn in ipairs(tabButtons) do
+        btn.MouseButton1Click:Connect(function()
+            switchTab(i)
+        end)
+    end
+
+    self.ScreenGui = ScreenGui
+    self.Frame = Frame
+    self.Tabs = tabContents
+    self.TabButtons = tabButtons
+    self.SwitchTab = switchTab
+
+    return self
+end
+
+return VbeUi
